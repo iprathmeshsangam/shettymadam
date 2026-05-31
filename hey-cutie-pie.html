@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hey Cutie Pie ❤️</title>
+  <title>Hey Shetty Madam ❤️</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Quicksand:wght@400;500;600;700&family=Dancing+Script:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -417,65 +417,73 @@ body {
   .cards-grid { grid-template-columns: repeat(4, 1fr); }
 }
 
-/* Flip card */
+/* ── Flip card ──────────────────────────────────────────
+   Strategy: card-inner uses CSS Grid with both faces in
+   the same cell. The BACK face (not rotated) is the one
+   that sets the natural height. Both faces are then
+   stretched to fill that height via align-self:stretch.
+   This avoids position:absolute entirely on the back,
+   which was causing the text-column overflow bug.
+   ─────────────────────────────────────────────────────── */
 .card-wrap {
   perspective: 900px;
   cursor: pointer;
-  /* Height driven by inner content — both faces must be same height */
+  /* width comes from the grid; height = auto from content */
 }
-/* Inner uses a padding-trick so both faces expand to the same size */
 .card-inner {
   width: 100%;
-  position: relative;
+  display: grid;
+  grid-template-areas: "stack";   /* single named area */
   transform-style: preserve-3d;
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 18px;
-  /* Minimum height so short-content cards still look good */
   min-height: 160px;
 }
 .card-wrap.flipped .card-inner { transform: rotateY(180deg); }
+
+/* Both faces sit in the same grid cell */
 .card-face {
-  position: absolute; 
-  inset: 0;
+  grid-area: stack;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   border-radius: 18px;
-  display: flex; align-items: center; justify-content: center;
-  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   box-shadow: 0 6px 20px var(--shadow-pink);
-  overflow: hidden;
+  width: 100%;
+  /* padding applied per-face below */
 }
-/* Invisible spacer that forces the card-inner to be tall enough */
-.card-sizer {
-  visibility: hidden;
-  padding: 14px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  line-height: 1.55;
-  word-break: break-word;
-  min-height: 160px;
-  display: flex; align-items: center; justify-content: center;
-}
+
 .card-front {
   background: linear-gradient(135deg, var(--pink-deep), var(--pink-mid));
   color: white;
   flex-direction: column;
   gap: 8px;
+  padding: 18px 14px;
+  /* Front is visible by default; back is rotated away */
 }
 .card-front .card-icon { font-size: 2rem; }
-.card-front .card-tap { font-size: 0.78rem; font-weight: 600; opacity: 0.9; letter-spacing: 0.5px; }
+.card-front .card-tap  { font-size: 0.78rem; font-weight: 600; opacity: 0.9; letter-spacing: 0.5px; }
+
 .card-back {
   background: rgba(255,255,255,0.9);
   color: var(--text-dark);
   font-family: var(--ff-body);
   font-size: 0.82rem;
   font-weight: 600;
-  line-height: 1.55;
+  line-height: 1.6;
+  /* Rotate 180° so it's hidden initially, shown after flip */
   transform: rotateY(180deg);
   border: 2px solid var(--pink-soft);
-  word-break: break-word;
-  padding: 18px 14px 14px;
-  align-items: center;
+  /* Normal block padding — no overflow issue */
+  padding: 28px 16px 18px;
+  /* Allow text to wrap naturally */
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+  position: relative;
 }
 .card-back::before {
   content: '💌';
@@ -483,26 +491,16 @@ body {
   font-size: 0.9rem; opacity: 0.45;
 }
 
-/* Apology cards */
+/* Apology variant */
 .apology-grid .card-front {
   background: linear-gradient(135deg, #be185d, #e8527a);
 }
 .apology-grid .card-back {
-  background: rgba(255,240,246,0.95);
-  font-size: 0.8rem;
-  line-height: 1.7;
+  background: rgba(255, 240, 246, 0.95);
+  font-size: 0.82rem;
+  line-height: 1.75;
 }
 .apology-grid .card-back::before { content: '💔'; }
-.apology-grid .card-sizer {
-  font-size: 0.8rem;
-  line-height: 1.7;
-  padding: 18px 14px 14px;
-}
-.apology-sizer {
-  font-size: 0.8rem !important;
-  line-height: 1.7 !important;
-  padding: 18px 14px 14px !important;
-}
 
 /* =====================================================
    SECTION 4 — APOLOGY CARDS
@@ -991,7 +989,7 @@ body {
       <div class="floating-hearts-intro" id="intro-hearts"></div>
     </div>
     <div class="intro-content">
-      <div class="intro-emoji-row">✨ <span class="glow-text">Hey Cutie Pie</span> ✨</div>
+      <div class="intro-emoji-row">✨ <span class="glow-text">Hey Shetty Madam</span> ✨</div>
       <div class="intro-heart-big">💖</div>
       <div class="warning-box">
         <p class="warning-label">⚠️ Warning</p>
@@ -1026,12 +1024,19 @@ body {
           <div class="scan-details" id="scan-details">
             <p>🔍 Scanning smile level...</p>
           </div>
+
+
+
+
           <div class="scan-error hidden" id="scan-error">
             <p class="error-title">⚠️ ERROR</p>
             <p class="error-body">Maximum allowed cuteness is 100%</p>
             <p class="error-score">You scored <span class="highlight">120%</span></p>
             <p class="error-sub">System Overloaded ❤️</p>
           </div>
+          <button class="btn-main hidden" id="scanner-btn" onclick="goToSection('love-cards')">
+        <span>Continue</span>
+      </button>
         </div>
         <div class="machine-bottom">
           <div class="machine-buttons-deco">
@@ -1039,9 +1044,6 @@ body {
           </div>
         </div>
       </div>
-      <button class="btn-main hidden" id="scanner-btn" onclick="goToSection('love-cards')">
-        <span>Continue</span>
-      </button>
     </div>
     <div id="scanner-particles" class="scanner-particles"></div>
   </section>
@@ -1205,9 +1207,9 @@ const LOVE_CARDS = [
   "The way you smile can improve even my worst day.",
   "You somehow make ordinary moments feel special.",
   "You are my favorite notification.",
-  "Your laugh deserves its own national treasure status.",
+  "The flawless grace you bring to your Bharatanatyam performance",
   "You are cute without even trying.",
-  "I still get happy when I see your name pop up.",
+  "I admire your courage, Authenticity and simplicity",
   "Your stubbornness is secretly adorable.",
   "You make life brighter.",
   "I love the little things you don't even notice about yourself.",
@@ -1215,22 +1217,21 @@ const LOVE_CARDS = [
 ];
 
 const APOLOGY_CARDS = [
-  { num: 1, text: "I hurt your feelings.\nWhether I intended to or not,\nthe hurt was real.\nI'm sorry." },
-  { num: 2, text: "I didn't always make you feel as important as you are.\nYou deserved better." },
-  { num: 3, text: "I know some of my choices caused pain.\nI'm genuinely sorry." },
-  { num: 4, text: "If I could undo the moments that hurt you,\nI would." },
-  { num: 5, text: "I never wanted to be the reason for your tears." }
+  { num: 1, text: "I hurt your feelings.Whether I intended to or not,the hurt was real.I'm sorry." },
+  { num: 2, text: "I didn't always make you feel as important as you are." },
+  { num: 3, text: "I know some of my words caused pain.I'm genuinely sorry. for whatever words I used." },
+  { num: 4, text: "If I could undo the moments that hurt you,I would." },
+  { num: 5, text: "I never wanted to be the reason for your tears." },
+  { num: 6, text: "I really sorry for not understanding your POV and be patient with you" }
 ];
 
 const MEMORIES = [
-  { emoji: "🌸", label: "The Beginning ❤️" },
-  { emoji: "💬", label: "Our First Long Conversation" },
-  { emoji: "☀️", label: "One Of My Favorite Days" },
-  { emoji: "🎶", label: "A Memory I Keep Replaying" },
-  { emoji: "🌙", label: "Late Night Talks" },
-  { emoji: "🍃", label: "A Quiet Moment Together" },
-  { emoji: "✨", label: "When Everything Felt Perfect" },
-  { emoji: "💌", label: "The Message That Made Me Smile" }
+  { img: "photo1.jpeg", label: "The Beginning ❤️" },
+  { img: "photo2.jpeg", label: "Our Long Conversation" },
+  { img: "photo3.jpeg", label: "One Of My Favorite Days" },
+  { img: "photo4.jpeg", label: "A Memory I Keep Replaying" },
+  { img: "photo5.jpeg", label: "A Quiet Moment Together" },
+  { img: "photo8.jpeg", label: "The Message That Made Me Smile" }
 ];
 
 const HEART_EMOJIS = ["❤️", "💕", "💖", "💗", "💓", "💞", "🌸", "💝"];
@@ -1456,7 +1457,6 @@ function initLoveCards() {
           <div class="card-tap">Tap To Reveal</div>
         </div>
         <div class="card-face card-back">${msg}</div>
-        <div class="card-sizer" aria-hidden="true">${msg}</div>
       </div>
     `;
     wrap.addEventListener("click", () => {
@@ -1485,17 +1485,15 @@ function initApologyCards() {
     wrap.className = "card-wrap";
     wrap.style.animationDelay = (i * 0.1) + "s";
     const textHtml = card.text.split("\n").map(l => `<span>${l}</span>`).join("<br>");
-    const textPlain = card.text.split("\n").join(" ");
     wrap.innerHTML = `
       <div class="card-inner">
         <div class="card-face card-front" style="background:linear-gradient(135deg,#be185d,#e8527a)">
           <div class="card-icon">💔</div>
           <div class="card-tap">Mistake #${card.num}</div>
         </div>
-        <div class="card-face card-back" style="font-size:0.8rem;line-height:1.7;background:rgba(255,240,246,0.95)">
+        <div class="card-face card-back" style="background:rgba(255,240,246,0.95)">
           ${textHtml}
         </div>
-        <div class="card-sizer apology-sizer" aria-hidden="true">${textPlain}</div>
       </div>
     `;
     wrap.addEventListener("click", () => wrap.classList.toggle("flipped"));
@@ -1576,8 +1574,12 @@ function initMemoryWall() {
     const p = document.createElement("div");
     p.className = "polaroid";
     p.style.animationDelay = (i * 0.12) + "s";
-    p.innerHTML = `
-      <div class="polaroid-img">${mem.emoji}</div>
+     p.innerHTML = `
+      <div class="polaroid-img">
+        ${mem.img
+          ? `<img src="/Images/${mem.img}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;" />`
+          : mem.emoji}
+      </div>
       <div class="polaroid-label">${mem.label}</div>
     `;
     wall.appendChild(p);

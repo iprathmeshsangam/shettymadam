@@ -407,64 +407,73 @@ body {
   .cards-grid { grid-template-columns: repeat(4, 1fr); }
 }
 
-/* Flip card */
+/* ── Flip card ──────────────────────────────────────────
+   Strategy: card-inner uses CSS Grid with both faces in
+   the same cell. The BACK face (not rotated) is the one
+   that sets the natural height. Both faces are then
+   stretched to fill that height via align-self:stretch.
+   This avoids position:absolute entirely on the back,
+   which was causing the text-column overflow bug.
+   ─────────────────────────────────────────────────────── */
 .card-wrap {
   perspective: 900px;
   cursor: pointer;
-  /* Height driven by inner content — both faces must be same height */
+  /* width comes from the grid; height = auto from content */
 }
-/* Inner uses a padding-trick so both faces expand to the same size */
 .card-inner {
   width: 100%;
-  position: relative;
+  display: grid;
+  grid-template-areas: "stack";   /* single named area */
   transform-style: preserve-3d;
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 18px;
-  /* Minimum height so short-content cards still look good */
   min-height: 160px;
 }
 .card-wrap.flipped .card-inner { transform: rotateY(180deg); }
+
+/* Both faces sit in the same grid cell */
 .card-face {
-  position: absolute; inset: 0;
+  grid-area: stack;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   border-radius: 18px;
-  display: flex; align-items: center; justify-content: center;
-  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   box-shadow: 0 6px 20px var(--shadow-pink);
-  overflow: hidden;
+  width: 100%;
+  /* padding applied per-face below */
 }
-/* Invisible spacer that forces the card-inner to be tall enough */
-.card-sizer {
-  visibility: hidden;
-  padding: 14px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  line-height: 1.55;
-  word-break: break-word;
-  min-height: 160px;
-  display: flex; align-items: center; justify-content: center;
-}
+
 .card-front {
   background: linear-gradient(135deg, var(--pink-deep), var(--pink-mid));
   color: white;
   flex-direction: column;
   gap: 8px;
+  padding: 18px 14px;
+  /* Front is visible by default; back is rotated away */
 }
 .card-front .card-icon { font-size: 2rem; }
-.card-front .card-tap { font-size: 0.78rem; font-weight: 600; opacity: 0.9; letter-spacing: 0.5px; }
+.card-front .card-tap  { font-size: 0.78rem; font-weight: 600; opacity: 0.9; letter-spacing: 0.5px; }
+
 .card-back {
   background: rgba(255,255,255,0.9);
   color: var(--text-dark);
   font-family: var(--ff-body);
   font-size: 0.82rem;
   font-weight: 600;
-  line-height: 1.55;
+  line-height: 1.6;
+  /* Rotate 180° so it's hidden initially, shown after flip */
   transform: rotateY(180deg);
   border: 2px solid var(--pink-soft);
-  word-break: break-word;
-  padding: 18px 14px 14px;
-  align-items: center;
+  /* Normal block padding — no overflow issue */
+  padding: 28px 16px 18px;
+  /* Allow text to wrap naturally */
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+  position: relative;
 }
 .card-back::before {
   content: '💌';
@@ -472,26 +481,16 @@ body {
   font-size: 0.9rem; opacity: 0.45;
 }
 
-/* Apology cards */
+/* Apology variant */
 .apology-grid .card-front {
   background: linear-gradient(135deg, #be185d, #e8527a);
 }
 .apology-grid .card-back {
-  background: rgba(255,240,246,0.95);
-  font-size: 0.8rem;
-  line-height: 1.7;
+  background: rgba(255, 240, 246, 0.95);
+  font-size: 0.82rem;
+  line-height: 1.75;
 }
 .apology-grid .card-back::before { content: '💔'; }
-.apology-grid .card-sizer {
-  font-size: 0.8rem;
-  line-height: 1.7;
-  padding: 18px 14px 14px;
-}
-.apology-sizer {
-  font-size: 0.8rem !important;
-  line-height: 1.7 !important;
-  padding: 18px 14px 14px !important;
-}
 
 /* =====================================================
    SECTION 4 — APOLOGY CARDS

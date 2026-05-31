@@ -7,7 +7,7 @@ const LOVE_CARDS = [
   "The way you smile can improve even my worst day.",
   "You somehow make ordinary moments feel special.",
   "You are my favorite notification.",
-  "Your laugh deserves its own national treasure status.",
+  "The flawless grace you bring to your Bharatanatyam performance",
   "You are cute without even trying.",
   "I still get happy when I see your name pop up.",
   "Your stubbornness is secretly adorable.",
@@ -258,7 +258,6 @@ function initLoveCards() {
           <div class="card-tap">Tap To Reveal</div>
         </div>
         <div class="card-face card-back">${msg}</div>
-        <div class="card-sizer" aria-hidden="true">${msg}</div>
       </div>
     `;
     wrap.addEventListener("click", () => {
@@ -287,17 +286,15 @@ function initApologyCards() {
     wrap.className = "card-wrap";
     wrap.style.animationDelay = (i * 0.1) + "s";
     const textHtml = card.text.split("\n").map(l => `<span>${l}</span>`).join("<br>");
-    const textPlain = card.text.split("\n").join(" ");
     wrap.innerHTML = `
       <div class="card-inner">
         <div class="card-face card-front" style="background:linear-gradient(135deg,#be185d,#e8527a)">
           <div class="card-icon">💔</div>
           <div class="card-tap">Mistake #${card.num}</div>
         </div>
-        <div class="card-face card-back" style="font-size:0.8rem;line-height:1.7;background:rgba(255,240,246,0.95)">
+        <div class="card-face card-back" style="background:rgba(255,240,246,0.95)">
           ${textHtml}
         </div>
-        <div class="card-sizer apology-sizer" aria-hidden="true">${textPlain}</div>
       </div>
     `;
     wrap.addEventListener("click", () => wrap.classList.toggle("flipped"));
